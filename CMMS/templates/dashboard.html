@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Maintenance Dashboard</h2>
+    <p class="subtitle">Ink Injection System - Production Line</p>
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-card card-primary">
+        <div class="card-icon">📦</div>
+        <div class="card-content">
+            <h3>Total Parts</h3>
+            <p class="card-value">{{ data.total_parts }}</p>
+            <a href="{{ url_for('parts') }}" class="btn-link">View all parts →</a>
+        </div>
+    </div>
+
+    <div class="dashboard-card card-danger">
+        <div class="card-icon">⚠️</div>
+        <div class="card-content">
+            <h3>Overdue Maintenance</h3>
+            <p class="card-value">{{ data.overdue_count }}</p>
+            <a href="{{ url_for('alerts') }}" class="btn-link">View overdue →</a>
+        </div>
+    </div>
+
+    <div class="dashboard-card card-warning">
+        <div class="card-icon">📅</div>
+        <div class="card-content">
+            <h3>Upcoming (30 days)</h3>
+            <p class="card-value">{{ data.upcoming_count }}</p>
+            <a href="{{ url_for('alerts') }}" class="btn-link">View schedule →</a>
+        </div>
+    </div>
+</div>
+
+{% if data.overdue %}
+<div class="alert-section">
+    <h3 class="section-title alert-title">Overdue Maintenance Required</h3>
+    <div class="alert alert-danger">
+        <strong>Action Required!</strong> The following parts require immediate maintenance:
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Part Name</th>
+                <th>Was Due</th>
+                <th>Days Overdue</th>
+                <th>Last Changed By</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in data.overdue %}
+            <tr class="row-overdue">
+                <td><strong>{{ record.name }}</strong></td>
+                <td>{{ record.next_scheduled_change[:10] }}</td>
+                <td class="text-danger">
+                    {{ ((now | default(None, true)) if now else 0) }} days
+                </td>
+                <td>{{ record.performed_by }}</td>
+                <td>
+                    <a href="{{ url_for('record_maintenance', part_id=record.part_id) }}" class="btn btn-sm btn-primary">Record Now</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="section">
+    <h3 class="section-title">Maintenance Status Overview</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Part</th>
+                <th>Last Changed</th>
+                <th>Next Due</th>
+                <th>Frequency</th>
+                <th>Changed By</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in data.all_records %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('view_part', part_id=record.part_id) }}" class="link">
+                        {{ record.name }}
+                    </a>
+                </td>
+                <td>{{ record.last_changed[:10] if record.last_changed else 'N/A' }}</td>
+                <td>{{ record.next_scheduled_change[:10] if record.next_scheduled_change else 'N/A' }}</td>
+                <td>{{ record.change_frequency_days }} days</td>
+                <td>{{ record.performed_by }}</td>
+                <td>
+                    {% set next_date = record.next_scheduled_change %}
+                    {% if next_date and next_date[:10] < data.now_iso[:10] %}
+                        <span class="badge badge-danger">Overdue</span>
+                    {% elif next_date and next_date[:10] <= data.future_7[:10] %}
+                        <span class="badge badge-warning">Due Soon</span>
+                    {% else %}
+                        <span class="badge badge-success">On Schedule</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

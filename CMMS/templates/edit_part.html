@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Part - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Edit Part</h2>
+    <p class="subtitle">{{ part.name }}</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" class="form">
+        <div class="form-group">
+            <label for="name">Part Name</label>
+            <input type="text" id="name" value="{{ part.name }}" readonly class="form-input">
+            <small>Part name cannot be changed</small>
+        </div>
+
+        <div class="form-group">
+            <label for="part_number">Part Number</label>
+            <input type="text" id="part_number" value="{{ part.part_number }}" readonly class="form-input">
+            <small>Part number cannot be changed</small>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location *</label>
+            <input type="text" id="location" name="location" required class="form-input"
+                   value="{{ part.location }}">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" class="form-input">{{ part.description }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{{ url_for('view_part', part_id=part.id) }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

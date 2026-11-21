@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Alerts - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Maintenance Alerts</h2>
+</div>
+
+{% if data.overdue %}
+<div class="section alert-section">
+    <h3 class="section-title alert-title">Overdue Maintenance</h3>
+    <div class="alert alert-danger">
+        <strong>Action Required!</strong> {{ data.overdue|length }} part(s) require immediate maintenance.
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Part Name</th>
+                <th>Was Due</th>
+                <th>Last Changed By</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in data.overdue %}
+            <tr class="row-overdue">
+                <td>
+                    <a href="{{ url_for('view_part', part_id=record.part_id) }}" class="link">
+                        {{ record.name }}
+                    </a>
+                </td>
+                <td>{{ record.next_scheduled_change[:10] }}</td>
+                <td>{{ record.performed_by }}</td>
+                <td>
+                    <a href="{{ url_for('record_maintenance', part_id=record.part_id) }}" class="btn btn-sm btn-primary">Record Now</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="section">
+    <div class="alert alert-success">
+        <strong>Great!</strong> No overdue maintenance at this time.
+    </div>
+</div>
+{% endif %}
+
+{% if data.upcoming_7days %}
+<div class="section">
+    <h3 class="section-title">Due Within 7 Days</h3>
+    <div class="alert alert-warning">
+        {{ data.upcoming_7days|length }} part(s) are due for maintenance within the next week.
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Part Name</th>
+                <th>Due Date</th>
+                <th>Days Until Due</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in data.upcoming_7days %}
+            <tr class="row-warning">
+                <td>
+                    <a href="{{ url_for('view_part', part_id=record.part_id) }}" class="link">
+                        {{ record.name }}
+                    </a>
+                </td>
+                <td>{{ record.next_scheduled_change[:10] }}</td>
+                <td>
+                    {% set due_date = record.next_scheduled_change.split('T')[0] %}
+                    Scheduled
+                </td>
+                <td>
+                    <a href="{{ url_for('view_instructions', part_id=record.part_id) }}" class="btn btn-sm btn-info">View Instructions</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if data.upcoming_30days %}
+<div class="section">
+    <h3 class="section-title">Scheduled for Next 30 Days</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Part Name</th>
+                <th>Due Date</th>
+                <th>Last Changed By</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in data.upcoming_30days %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('view_part', part_id=record.part_id) }}" class="link">
+                        {{ record.name }}
+                    </a>
+                </td>
+                <td>{{ record.next_scheduled_change[:10] }}</td>
+                <td>{{ record.performed_by }}</td>
+                <td>
+                    <a href="{{ url_for('view_instructions', part_id=record.part_id) }}" class="btn btn-sm btn-info">Instructions</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

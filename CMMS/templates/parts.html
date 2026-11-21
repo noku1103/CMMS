@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Parts - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Parts Management</h2>
+    <a href="{{ url_for('add_part') }}" class="btn btn-primary">+ Add New Part</a>
+</div>
+
+<div class="parts-grid">
+    {% for item in parts %}
+    <div class="part-card">
+        <div class="part-header">
+            <h3>{{ item.part.name }}</h3>
+            <span class="part-number">{{ item.part.part_number }}</span>
+        </div>
+
+        <div class="part-body">
+            <div class="part-info">
+                <p><strong>Location:</strong> {{ item.part.location }}</p>
+                <p><strong>Description:</strong> {{ item.part.description }}</p>
+            </div>
+
+            {% if item.record %}
+            <div class="maintenance-info">
+                <h4>Maintenance Schedule</h4>
+                <p>
+                    <span class="label">Last Changed:</span>
+                    <span class="value">{{ item.record.last_changed[:10] if item.record.last_changed else 'Not recorded' }}</span>
+                </p>
+                <p>
+                    <span class="label">Next Due:</span>
+                    <span class="value">{{ item.record.next_scheduled_change[:10] if item.record.next_scheduled_change else 'Not scheduled' }}</span>
+                </p>
+                <p>
+                    <span class="label">Frequency:</span>
+                    <span class="value">{{ item.record.change_frequency_days }} days</span>
+                </p>
+                <p>
+                    <span class="label">Last Changed By:</span>
+                    <span class="value">{{ item.record.performed_by }}</span>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="part-actions">
+            <a href="{{ url_for('view_part', part_id=item.part.id) }}" class="btn btn-sm btn-info">Details</a>
+            <a href="{{ url_for('record_maintenance', part_id=item.part.id) }}" class="btn btn-sm btn-primary">Record Maintenance</a>
+            <a href="{{ url_for('view_instructions', part_id=item.part.id) }}" class="btn btn-sm btn-secondary">Instructions</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not parts %}
+<div class="empty-state">
+    <h3>No parts added yet</h3>
+    <p>Start by adding the first part to your maintenance system</p>
+    <a href="{{ url_for('add_part') }}" class="btn btn-primary">Add First Part</a>
+</div>
+{% endif %}
+{% endblock %}

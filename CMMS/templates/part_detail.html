@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}{{ part.name }} - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ part.name }}</h2>
+    <p class="subtitle">{{ part.part_number }}</p>
+</div>
+
+<div class="detail-grid">
+    <div class="detail-card">
+        <h3>Part Information</h3>
+        <div class="detail-content">
+            <p><strong>Part Number:</strong> {{ part.part_number }}</p>
+            <p><strong>Location:</strong> {{ part.location }}</p>
+            <p><strong>Description:</strong> {{ part.description }}</p>
+            <div class="button-group">
+                <a href="{{ url_for('edit_part', part_id=part.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+            </div>
+        </div>
+    </div>
+
+    {% if record %}
+    <div class="detail-card">
+        <h3>Current Maintenance Schedule</h3>
+        <div class="detail-content">
+            <p>
+                <strong>Last Changed:</strong>
+                <span class="value">{{ record.last_changed[:10] if record.last_changed else 'Not recorded' }}</span>
+            </p>
+            <p>
+                <strong>Next Due:</strong>
+                <span class="value">{{ record.next_scheduled_change[:10] if record.next_scheduled_change else 'Not scheduled' }}</span>
+            </p>
+            <p>
+                <strong>Change Frequency:</strong>
+                <span class="value">{{ record.change_frequency_days }} days</span>
+            </p>
+            <p>
+                <strong>Last Changed By:</strong>
+                <span class="value">{{ record.performed_by }}</span>
+            </p>
+            {% if record.notes %}
+            <p>
+                <strong>Notes:</strong>
+                <span class="value">{{ record.notes }}</span>
+            </p>
+            {% endif %}
+            <a href="{{ url_for('record_maintenance', part_id=part.id) }}" class="btn btn-primary">Update Maintenance</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="detail-card">
+        <h3>No Maintenance Record</h3>
+        <p>No maintenance schedule has been set for this part yet.</p>
+        <a href="{{ url_for('record_maintenance', part_id=part.id) }}" class="btn btn-primary">Create First Record</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="section">
+    <h3 class="section-title">Maintenance Instructions</h3>
+    {% if instructions %}
+    <div class="instructions-list">
+        <ol>
+            {% for instr in instructions %}
+            <li class="instruction-step">
+                {{ instr.instruction_text }}
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+    <a href="{{ url_for('add_instruction', part_id=part.id) }}" class="btn btn-sm btn-secondary">Add Instruction</a>
+    {% else %}
+    <p>No instructions available for this part.</p>
+    <a href="{{ url_for('add_instruction', part_id=part.id) }}" class="btn btn-primary">Add Instructions</a>
+    {% endif %}
+</div>
+
+<div class="section">
+    <h3 class="section-title">Change History</h3>
+    {% if history %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Changed By</th>
+                <th>Reason</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for change in history %}
+            <tr>
+                <td>{{ change.changed_at }}</td>
+                <td>{{ change.changed_by }}</td>
+                <td>{{ change.reason }}</td>
+                <td>{{ change.notes or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No change history available.</p>
+    {% endif %}
+</div>
+{% endblock %}

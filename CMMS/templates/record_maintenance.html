@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Record Maintenance - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Record Maintenance</h2>
+    <p class="subtitle">{{ part.name }}</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" class="form">
+        <div class="info-box">
+            <p><strong>Part:</strong> {{ part.name }}</p>
+            <p><strong>Part Number:</strong> {{ part.part_number }}</p>
+            <p><strong>Location:</strong> {{ part.location }}</p>
+        </div>
+
+        <div class="form-group">
+            <label for="last_changed">Last Changed Date *</label>
+            <input type="date" id="last_changed" name="last_changed" required
+                   class="form-input" value="{{ today }}">
+            <small>Date when this maintenance was performed</small>
+        </div>
+
+        <div class="form-group">
+            <label for="frequency">Change Frequency (days) *</label>
+            <input type="number" id="frequency" name="frequency" required
+                   class="form-input" value="90" min="1">
+            <small>How often should this part be maintained?</small>
+        </div>
+
+        <div class="form-group">
+            <label for="performed_by">Performed By *</label>
+            <input type="text" id="performed_by" name="performed_by" required
+                   class="form-input" placeholder="Your name or ID">
+            <small>Who is performing this maintenance?</small>
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" rows="4" class="form-input"
+                      placeholder="Any special observations or issues noted during maintenance"></textarea>
+        </div>
+
+        {% if record %}
+        <div class="info-box">
+            <h4>Previous Record</h4>
+            <p><strong>Last Changed:</strong> {{ record.last_changed[:10] if record.last_changed else 'N/A' }}</p>
+            <p><strong>Next Due:</strong> {{ record.next_scheduled_change[:10] if record.next_scheduled_change else 'N/A' }}</p>
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Record Maintenance</button>
+            <a href="{{ url_for('view_part', part_id=part.id) }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

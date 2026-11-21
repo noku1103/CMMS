@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Maintenance Records - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>All Maintenance Records</h2>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Part Name</th>
+            <th>Part Number</th>
+            <th>Last Changed</th>
+            <th>Next Due</th>
+            <th>Frequency</th>
+            <th>Changed By</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td>
+                <a href="{{ url_for('view_part', part_id=record.part_id) }}" class="link">
+                    {{ record.name }}
+                </a>
+            </td>
+            <td>N/A</td>
+            <td>{{ record.last_changed[:10] if record.last_changed else 'N/A' }}</td>
+            <td>{{ record.next_scheduled_change[:10] if record.next_scheduled_change else 'N/A' }}</td>
+            <td>{{ record.change_frequency_days }} days</td>
+            <td>{{ record.performed_by }}</td>
+            <td>
+                <a href="{{ url_for('record_maintenance', part_id=record.part_id) }}" class="btn btn-sm btn-primary">Update</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if not records %}
+<div class="empty-state">
+    <h3>No maintenance records yet</h3>
+    <p>Start recording maintenance for your parts</p>
+    <a href="{{ url_for('parts') }}" class="btn btn-primary">View Parts</a>
+</div>
+{% endif %}
+{% endblock %}

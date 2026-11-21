@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Instructions - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Maintenance Instructions</h2>
+    <p class="subtitle">{{ part.name }}</p>
+</div>
+
+<div class="instructions-container">
+    {% if instructions %}
+    <div class="instructions-list">
+        <h3>Step-by-Step Procedure</h3>
+        <ol class="numbered-list">
+            {% for instr in instructions %}
+            <li class="instruction-item">
+                <div class="instruction-number">{{ instr.step_number }}</div>
+                <div class="instruction-text">{{ instr.instruction_text }}</div>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{{ url_for('add_instruction', part_id=part.id) }}" class="btn btn-secondary">Add Step</a>
+        <a href="{{ url_for('view_part', part_id=part.id) }}" class="btn btn-primary">Back to Part Details</a>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No Instructions Available</h3>
+        <p>Add step-by-step maintenance instructions for this part.</p>
+        <a href="{{ url_for('add_instruction', part_id=part.id) }}" class="btn btn-primary">Add First Instruction</a>
+    </div>
+    {% endif %}
+
+    <div class="section">
+        <h3>Part Information</h3>
+        <div class="info-box">
+            <p><strong>Part Number:</strong> {{ part.part_number }}</p>
+            <p><strong>Location:</strong> {{ part.location }}</p>
+            <p><strong>Description:</strong> {{ part.description }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Change History - CMMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Change History</h2>
+    <p class="subtitle">{{ part.name }}</p>
+</div>
+
+<div class="section">
+    {% if history %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date & Time</th>
+                <th>Changed By</th>
+                <th>Reason</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for change in history %}
+            <tr>
+                <td>{{ change.changed_at }}</td>
+                <td>{{ change.changed_by }}</td>
+                <td>{{ change.reason }}</td>
+                <td>{{ change.notes or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <h3>No change history available</h3>
+        <p>Changes will be recorded here when maintenance is performed.</p>
+    </div>
+    {% endif %}
+
+    <div class="action-buttons">
+        <a href="{{ url_for('view_part', part_id=part.id) }}" class="btn btn-primary">Back to Part Details</a>
+    </div>
+</div>
+{% endblock %}
